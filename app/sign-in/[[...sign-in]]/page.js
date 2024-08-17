@@ -5,12 +5,12 @@ export default function SignInPage() {
   return <Container>
     <AppBar position="sticky">
           <Toolbar>
-          <Typography variant="h6" style={{flexGrow:1}}><Link color="inherit" href="/" passHref>CulinariQ</Link></Typography>
+          <Typography variant="h6" style={{flexGrow:1}}><Link color="inherit" href="/" >CulinariQ</Link></Typography>
             {/* <Button color="inherit">
                 <Link color="inherit" href="/login" passHref>Login</Link>
             </Button> */}
             <Button color="inherit">
-                <Link color="inherit" href="/sign-up" passHref>Sign Up</Link>
+                <Link color="inherit" href="/sign-up" >Sign Up</Link>
             </Button>
           </Toolbar>
         </AppBar>

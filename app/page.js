@@ -95,8 +95,8 @@ export default function Home() {
         <Toolbar>
           <Typography variant="h6" style={{flexGrow:1}}>CulinariQ</Typography>
           <SignedOut>
-            <Button color="inherit"><Link href="/sign-in" passHref color="inherit">Login</Link></Button>
-            <Button color="inherit"><Link href="/sign-up" passHref color="inherit">Sign Up</Link></Button>
+            <Button color="inherit"><Link href="/sign-in" color="inherit">Login</Link></Button>
+            <Button color="inherit"><Link href="/sign-up" color="inherit">Sign Up</Link></Button>
           </SignedOut>
           <SignedIn>
             <UserButton/>

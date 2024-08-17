@@ -5,9 +5,9 @@ export default function SignUpPage() {
   return <Container>
     <AppBar position="sticky">
           <Toolbar>
-            <Typography variant="h6" style={{flexGrow:1}}><Link color="inherit" href="/" passHref>CulinariQ</Link></Typography>
+            <Typography variant="h6" style={{flexGrow:1}}><Link color="inherit" href="/" >CulinariQ</Link></Typography>
             <Button color="inherit">
-                <Link color="inherit" href="/sign-in" passHref>Login</Link>
+                <Link color="inherit" href="/sign-in" >Login</Link>
             </Button>
             {/* <Button color="inherit">
                 <Link color="inherit" href="/sign-up" passHref>Sign Up</Link>
