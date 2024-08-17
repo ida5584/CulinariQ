@@ -1,4 +1,6 @@
 // Import the functions you need from the SDKs you need
+require("dotenv").config();
+
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -7,7 +9,7 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBLac6Rh5uwuVwE1_tVW11GVR27iiDiYhU",
+  apiKey: process.env.FIREBASE_KEY,
   authDomain: "culinariq.firebaseapp.com",
   projectId: "culinariq",
   storageBucket: "culinariq.appspot.com",
