@@ -15,7 +15,7 @@ const ingredients = {
 
 const PageContainer = styled('div')({
   padding: '20px',
-  paddingTop: '80px', 
+  paddingTop: '80px',
 });
 
 const IngredientGrid = styled(Grid)({
@@ -97,9 +97,9 @@ const IngredientsPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CulinariQ
           </Typography>
-          <Link href="/" passHref>
-            <Button color="inherit" component="a">Back to Home</Button>
-          </Link>
+          <Button color="inherit" component={Link} href="/">
+            Back to Home
+          </Button>
         </Toolbar>
       </AppBar>
       <PageContainer>
