@@ -69,8 +69,9 @@ const IngredientsPage = () => {
     await reader.read().then(function processText({ done, value }) {
       if (done) {
         try {
-          console.log(result);
+          // console.log(result);
           const responseData = JSON.parse(result);
+          console.log(responseData);
           setRecipeName(responseData.recipeName);
           setRecipeIngredients(responseData.ingredients);
           setInstructions(responseData.instructions);

@@ -3,13 +3,14 @@ require("dotenv").config("..");
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const systemPrompt = `You are a culinary assistant chatbot. Provide a recipe based on given ingredients, skill level, and cuisine type. The response must ONLY be a JSON object with the following structure:
-                        {
+const systemPrompt = `You are a culinary assistant chatbot. Provide a recipe based on given ingredients, skill level, and cuisine type. The response must ONLY be a  array of JSON objects with the following structure:
+                        [{
                         "recipeName": "Recipe Name",
                         "ingredients": "Ingredients list",
                         "instructions": "Step-by-step instructions",
                         "cookingTips": "Cooking tips"
-                        }
+                        },
+                        ...]
                         `
 
 export async function POST(req){

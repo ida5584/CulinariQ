@@ -1,0 +1,21 @@
+/* RecipePage.css */
+.recipe-enter {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  .recipe-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 500ms, transform 500ms;
+  }
+  
+  .recipe-exit {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .recipe-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 500ms, transform 500ms;
+  }
+  
