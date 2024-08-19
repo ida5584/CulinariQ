@@ -3,7 +3,7 @@ require("dotenv").config("..");
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const systemPrompt = `You are a culinary assistant chatbot. Provide a recipe based on given ingredients, skill level, and cuisine type. The response must ONLY be a  array of JSON objects with the following structure:
+const systemPrompt = `You are a culinary assistant chatbot. Provide 6 recipes based on given ingredients, skill level, and cuisine type. The following is the only acceptable response format, DO NOT include any inital text:
                         [{
                         "recipeName": "Recipe Name",
                         "ingredients": "Ingredients list",
@@ -20,7 +20,7 @@ export async function POST(req){
     const data = await req.json()
 
     const completion = await openai.chat.completions.create({
-        model: "meta-llama/llama-3.1-8b-instruct:free",//"gpt-4o-mini",
+        model: "nousresearch/hermes-3-llama-3.1-405b",//"gpt-4o-mini",
         stream: true,
         messages: [
             {

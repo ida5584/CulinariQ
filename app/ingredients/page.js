@@ -1,10 +1,10 @@
 'use client'
 import React, { useState } from 'react';
-import Link from 'next/link';
 import Head from 'next/head';
 import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardContent, Typography, Chip, Box, AppBar, Toolbar } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/system';
+import Link from 'next/link';
 
 const ingredients = {
   carbs: ['Rice', 'Pasta', 'Potato', 'Bread', 'Quinoa'],
@@ -22,7 +22,8 @@ const IngredientGrid = styled(Grid)({
   marginBottom: '20px',
 });
 
-const GenerateButton = styled(Button)({
+const GenerateButton = styled(Link)({
+  border: '1px black',
   display: 'block',
   marginLeft: 'auto',
   marginRight: '0',
@@ -38,6 +39,11 @@ const IngredientsPage = () => {
   const [instructions, setInstructions] = useState('');
   const [cookingTips, setCookingTips] = useState('');
 
+  // const navigate = useNavigate();
+  // const navigateToRecipes = () => {
+  //   navigate('/recipes', {state:selectedIngredients})
+  // }
+
   const handleIngredientToggle = (ingredient) => {
     setSelectedIngredients(prevSelected =>
       prevSelected.includes(ingredient)
@@ -50,42 +56,6 @@ const IngredientsPage = () => {
     setSelectedIngredients(prevSelected => prevSelected.filter(item => item !== ingredient));
   };
 
-  const fetchRecipe = async () => {
-    const response = await fetch('/api/chat', {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([{
-        role: "user",
-        content: `Ingredients: ${selectedIngredients.join(', ')}, Skill level: beginner, Cuisine: any`
-      }]),
-    });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    let result = '';
-    await reader.read().then(function processText({ done, value }) {
-      if (done) {
-        try {
-          // console.log(result);
-          const responseData = JSON.parse(result);
-          console.log(responseData);
-          setRecipeName(responseData.recipeName);
-          setRecipeIngredients(responseData.ingredients);
-          setInstructions(responseData.instructions);
-          setCookingTips(responseData.cookingTips);
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
-        return result;
-      }
-      const text = decoder.decode(value || new Int8Array(), { stream: true });
-      result += text;
-      return reader.read().then(processText);
-    });
-  };
 
   return (
     <>
@@ -98,7 +68,7 @@ const IngredientsPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CulinariQ
           </Typography>
-          <Button color="inherit" component={Link} href="/">
+          <Button color="inherit" href="/">
             Back to Home
           </Button>
         </Toolbar>
@@ -158,10 +128,12 @@ const IngredientsPage = () => {
           </Grid>
         </IngredientGrid>
 
-        <GenerateButton variant="contained"
-          onClick={fetchRecipe}
+        <GenerateButton variant="contained" href={{
+            pathname:'recipes',
+            query:{ingredients:selectedIngredients}
+          }}
           disabled={selectedIngredients.length === 0}>
-          Generate Recipe
+          Generate Recipes
         </GenerateButton>
 
         {recipeName && (
