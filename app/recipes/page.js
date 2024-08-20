@@ -1,9 +1,13 @@
 // export default IngredientsPage;
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Box, Button, Container } from '@mui/material';
+import Head from 'next/head';
+import { Card, CardContent, Typography, Box, Button, Container, AppBar, Toolbar } from '@mui/material';
+import { styled } from '@mui/system';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import ReactMarkdown from 'react-markdown'
 import '../CSS/RecipePage.css'; // Import CSS for animations
+import Link from 'next/link';
 
 // Sample JSON array of recipes
 const recipesData = [
@@ -39,6 +43,11 @@ const recipesData = [
   }
 ];
 
+const PageContainer = styled('div')({
+  padding: '20px',
+  paddingTop: '80px',
+});
+
 const RecipePage = ({searchParams}) => {
   const [visibleRecipes, setVisibleRecipes] = useState([]); // Show first 3 recipes initially
   const [unseenRecipes, setUnseenRecipes] = useState([]); // Remaining recipes
@@ -58,7 +67,7 @@ const RecipePage = ({searchParams}) => {
       },
       body: JSON.stringify([{
         role: "user",
-        content: `Ingredients: ${searchParams.ingredients.join(', ')}, Skill level: beginner, Cuisine: any`
+        content: `Ingredients: ${searchParams.ingredients.constructor === Array? searchParams.ingredients.join(', ') : searchParams.ingredients}, Skill level: beginner, Cuisine: any`
       }]),
     });
     console.log("Recieved Response Now")
@@ -112,62 +121,98 @@ const RecipePage = ({searchParams}) => {
   };
 
   return (
-    <Container>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <TransitionGroup component={null}>
-          {visibleRecipes.map((recipe, index) => (
-            <CSSTransition
-              key={recipe.name}
-              timeout={500}
-              classNames="recipe"
-            >
-              <div style={{ flexBasis: '30%' }}>
-                <Card
-                  onMouseEnter={() => setHoveredRecipe(index)}
-                  onMouseLeave={() => setHoveredRecipe(null)}
-                  style={{ minHeight: '300px', transition: '0.3s' }}
+    <>
+    <Head>
+        <title>Recipes - CulinariQ</title>
+        <meta name="description" content="Select one of the Recipes with CulinariQ" />
+      </Head>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            CulinariQ
+          </Typography>
+          <Button color="inherit" href="/">
+            Back to Home
+          </Button>
+          <Link href={{
+            pathname:'ingredients',
+            query:{ingredients:searchParams.ingredients}
+          }} >
+              <Button sx={{color:"white"}} color="inherit"
+              >Back to Ingredients</Button>
+        </Link>
+        </Toolbar>
+      </AppBar>
+      <PageContainer>
+        <h1 className="text-2xl font-bold mb-4">Select Recipe</h1>
+        <Container>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <TransitionGroup component={null}>
+              {visibleRecipes.map((recipe, index) => (
+                <CSSTransition
+                  key={recipe.name}
+                  timeout={500}
+                  classNames="recipe"
                 >
-                  <CardContent>
-                    <Typography variant="h5" component="div">
-                      {recipe.recipeName}
-                    </Typography>
-                    <Typography variant="body1">
-                      <strong>Ingredients:</strong>
-                      <ul>
-                        {recipe.ingredients}
-                        {/* {recipe.ingredients.map((ingredient, i) => (
-                          <li key={i}>{ingredient}</li>
-                        ))} */}
-                      </ul>
-                    </Typography>
-                    {/* Show instructions and tips on hover */}
-                    {hoveredRecipe === index && (
-                      <Box mt={2}>
-                        <Typography variant="body2">
-                          <strong>Instructions:</strong> {recipe.instructions}
-                        </Typography>
-                        <Typography variant="body2" mt={1}>
-                          <strong>Cooking Tips:</strong> {recipe.cookingTips}
-                        </Typography>
-                      </Box>
-                    )}
-                    {/* Delete Button */}
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => handleDelete(index)}
-                      sx={{ mt: 2 }}
+                  <div style={{ flexBasis: '30%' }}>
+                    <Card
+                      onMouseEnter={() => setHoveredRecipe(index)}
+                      onMouseLeave={() => setHoveredRecipe(null)}
+                      style={{ minHeight: '300px', transition: '0.3s' }}
                     >
-                      Delete Recipe
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </CSSTransition>
-          ))}
-        </TransitionGroup>
-      </div>
-    </Container>
+                      <CardContent>
+                        <Typography variant="h5" component="div">
+                          {recipe.recipeName}
+                        </Typography>
+                        <Typography variant="body1">
+                        
+                          <strong>Ingredients:</strong>
+                          <ul>
+                            <ReactMarkdown >
+                              {recipe.ingredients}
+                            </ReactMarkdown>
+                            {/* {recipe.ingredients.map((ingredient, i) => (
+                              <li key={i}>{ingredient}</li>
+                            ))} */}
+                          </ul>
+                        </Typography>
+                        {/* Show instructions and tips on hover */}
+                        {hoveredRecipe === index && (
+                          <Box mt={2}>
+                            {/* <Typography variant="body2"> */}
+                              <strong>Instructions:</strong> <ReactMarkdown >
+                              {recipe.instructions}
+                            </ReactMarkdown>
+                            {/* {recipe.instructions} */}
+                            {/* </Typography> */}
+                            {/* <Typography variant="body2" mt={1}> */}
+                              <strong>Cooking Tips:</strong> 
+                              <ReactMarkdown >
+                                {recipe.cookingTips}
+                              </ReactMarkdown>
+                              {/* {recipe.cookingTips} */}
+                            {/* </Typography> */}
+                          </Box>
+                        )}
+                        {/* Delete Button */}
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => handleDelete(index)}
+                          sx={{ mt: 2 }}
+                        >
+                          Delete Recipe
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CSSTransition>
+              ))}
+            </TransitionGroup>
+          </div>
+        </Container>
+      </PageContainer>
+    </>
   );
 };
 

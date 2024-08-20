@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardContent, Typography, Chip, Box, AppBar, Toolbar } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
@@ -22,8 +22,7 @@ const IngredientGrid = styled(Grid)({
   marginBottom: '20px',
 });
 
-const GenerateButton = styled(Link)({
-  border: '1px black',
+const GenerateButton = styled(Button)({
   display: 'block',
   marginLeft: 'auto',
   marginRight: '0',
@@ -31,7 +30,7 @@ const GenerateButton = styled(Link)({
   marginBottom: '20px',
 });
 
-const IngredientsPage = () => {
+const IngredientsPage = ({searchParams}) => {
   const [selectedCategory, setSelectedCategory] = useState('carbs');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [recipeName, setRecipeName] = useState('');
@@ -39,10 +38,31 @@ const IngredientsPage = () => {
   const [instructions, setInstructions] = useState('');
   const [cookingTips, setCookingTips] = useState('');
 
-  // const navigate = useNavigate();
-  // const navigateToRecipes = () => {
-  //   navigate('/recipes', {state:selectedIngredients})
-  // }
+  const loadOnce= useRef(false);
+
+  const onLoadIngredients = ()=>{
+    try{
+      console.log(searchParams.ingredients)
+      if (searchParams.ingredients){
+        if (searchParams.ingredients.constructor === Array){
+          setSelectedIngredients(searchParams.ingredients)
+        } else{
+          setSelectedIngredients([searchParams.ingredients])
+        }
+      }
+    } catch (error){
+      console.error('Error:', error)
+    }
+  }
+
+  useEffect(() => {
+    // Use effect used here to when "Back to Ingredients button is used in recipe page 
+    // console.log("Running Use Effect, loadOnce: ", loadOnce.current)
+    if (!loadOnce.current){
+      loadOnce.current =true
+      onLoadIngredients()
+    }
+  }, [])
 
   const handleIngredientToggle = (ingredient) => {
     setSelectedIngredients(prevSelected =>
@@ -68,12 +88,12 @@ const IngredientsPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CulinariQ
           </Typography>
-          <Button color="inherit" href="/">
+          <Button color="inherit" href="/" >
             Back to Home
           </Button>
         </Toolbar>
       </AppBar>
-      <PageContainer>
+      <PageContainer onload={()=>onLoadIngredients()}>
         <h1 className="text-2xl font-bold mb-4">Select Ingredients</h1>
 
         {/* Selected Ingredients List */}
@@ -128,13 +148,13 @@ const IngredientsPage = () => {
           </Grid>
         </IngredientGrid>
 
-        <GenerateButton variant="contained" href={{
+
+        <Link href={{
             pathname:'recipes',
             query:{ingredients:selectedIngredients}
-          }}
-          disabled={selectedIngredients.length === 0}>
-          Generate Recipes
-        </GenerateButton>
+          }} disabled={selectedIngredients.length === 0}>
+                <GenerateButton variant="contained" color="primary" disabled={selectedIngredients.length === 0} >Generate Recipes</GenerateButton>
+        </Link>
 
         {recipeName && (
           <Box mt={3}>
