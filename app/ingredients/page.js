@@ -5,6 +5,8 @@ import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardC
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/system';
 import Link from 'next/link';
+import { useUser } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
 
 const ingredients = {
   carbs: ['Rice', 'Pasta', 'Potato', 'Bread', 'Quinoa'],
@@ -31,6 +33,10 @@ const GenerateButton = styled(Button)({
 });
 
 const IngredientsPage = ({searchParams}) => {
+  // User check
+  const { isLoaded, isSignedIn, user } = useUser()
+
+  
   const [selectedCategory, setSelectedCategory] = useState('carbs');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [recipeName, setRecipeName] = useState('');
@@ -56,13 +62,19 @@ const IngredientsPage = ({searchParams}) => {
   }
 
   useEffect(() => {
+    console.log(user)
+    console.log(isSignedIn)
+    // If not a valid user return to home 
+    if (isSignedIn === false ){
+      return redirect('/sign-in')
+    }
     // Use effect used here to when "Back to Ingredients button is used in recipe page 
     // console.log("Running Use Effect, loadOnce: ", loadOnce.current)
     if (!loadOnce.current){
       loadOnce.current =true
       onLoadIngredients()
     }
-  }, [])
+  }, [user])
 
   const handleIngredientToggle = (ingredient) => {
     setSelectedIngredients(prevSelected =>
