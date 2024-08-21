@@ -5,8 +5,12 @@ import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardC
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/system';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
+import {
+  useUser,
+  SignedIn,
+  UserButton
+} from '@clerk/nextjs'
 
 const ingredients = {
   carbs: ['Rice', 'Pasta', 'Potato', 'Bread', 'Quinoa'],
@@ -103,6 +107,10 @@ const IngredientsPage = ({searchParams}) => {
           <Button color="inherit" href="/" >
             Back to Home
           </Button>
+          <SignedIn>
+            <UserButton />
+            <Button color="inherit">Logout</Button>
+          </SignedIn>
         </Toolbar>
       </AppBar>
       <PageContainer onload={()=>onLoadIngredients()}>

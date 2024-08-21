@@ -8,6 +8,12 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import ReactMarkdown from 'react-markdown'
 import '../CSS/RecipePage.css'; // Import CSS for animations
 import Link from 'next/link';
+import {
+  useUser,
+  SignedIn,
+  UserButton
+} from '@clerk/nextjs'
+import { redirect } from 'next/navigation';
 
 // Sample JSON array of recipes
 const recipesData = [
@@ -49,6 +55,9 @@ const PageContainer = styled('div')({
 });
 
 const RecipePage = ({searchParams}) => {
+  // User check
+  const { isLoaded, isSignedIn, user } = useUser()
+  
   const [visibleRecipes, setVisibleRecipes] = useState([]); // Show first 3 recipes initially
   const [unseenRecipes, setUnseenRecipes] = useState([]); // Remaining recipes
   // Temp testing
@@ -96,13 +105,17 @@ const RecipePage = ({searchParams}) => {
   };
 
   useEffect(() => {
-    try {
-      console.log(searchParams.ingredients)
-      // This code runs when the component is mounted (on page load)
-      fetchRecipe()
-      
-    } catch (error) {
-      console.error('Error fetching data:', error);
+    if (isSignedIn === false ){
+      return redirect('/sign-in')
+    } else {
+      try {
+        console.log(searchParams.ingredients)
+        // This code runs when the component is mounted (on page load)
+        fetchRecipe()
+        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     }
   }, []);
 
@@ -140,7 +153,11 @@ const RecipePage = ({searchParams}) => {
           }} >
               <Button sx={{color:"white"}} color="inherit"
               >Back to Ingredients</Button>
-        </Link>
+          </Link>
+          <SignedIn>
+            <UserButton />
+            <Button color="inherit">Logout</Button>
+          </SignedIn>
         </Toolbar>
       </AppBar>
       <PageContainer>
