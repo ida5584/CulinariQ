@@ -1,10 +1,16 @@
 'use client'
-import React, { useState } from 'react';
-import Link from 'next/link';
+import React, { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
 import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardContent, Typography, Chip, Box, AppBar, Toolbar } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/system';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import {
+  useUser,
+  SignedIn,
+  UserButton
+} from '@clerk/nextjs'
 
 const ingredients = {
   carbs: ['Rice', 'Pasta', 'Potato', 'Bread', 'Quinoa'],
@@ -30,13 +36,49 @@ const GenerateButton = styled(Button)({
   marginBottom: '20px',
 });
 
-const IngredientsPage = () => {
+const IngredientsPage = ({searchParams}) => {
+  // User check
+  const { isLoaded, isSignedIn, user } = useUser()
+
+  
   const [selectedCategory, setSelectedCategory] = useState('carbs');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [recipeName, setRecipeName] = useState('');
   const [recipeIngredients, setRecipeIngredients] = useState('');
   const [instructions, setInstructions] = useState('');
   const [cookingTips, setCookingTips] = useState('');
+
+  const loadOnce= useRef(false);
+
+  const onLoadIngredients = ()=>{
+    try{
+      console.log(searchParams.ingredients)
+      if (searchParams.ingredients){
+        if (searchParams.ingredients.constructor === Array){
+          setSelectedIngredients(searchParams.ingredients)
+        } else{
+          setSelectedIngredients([searchParams.ingredients])
+        }
+      }
+    } catch (error){
+      console.error('Error:', error)
+    }
+  }
+
+  useEffect(() => {
+    console.log(user)
+    console.log(isSignedIn)
+    // If not a valid user return to home 
+    if (isSignedIn === false ){
+      return redirect('/sign-in')
+    }
+    // Use effect used here to when "Back to Ingredients button is used in recipe page 
+    // console.log("Running Use Effect, loadOnce: ", loadOnce.current)
+    if (!loadOnce.current){
+      loadOnce.current =true
+      onLoadIngredients()
+    }
+  }, [user])
 
   const handleIngredientToggle = (ingredient) => {
     setSelectedIngredients(prevSelected =>
@@ -50,41 +92,6 @@ const IngredientsPage = () => {
     setSelectedIngredients(prevSelected => prevSelected.filter(item => item !== ingredient));
   };
 
-  const fetchRecipe = async () => {
-    const response = await fetch('/api/chat', {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([{
-        role: "user",
-        content: `Ingredients: ${selectedIngredients.join(', ')}, Skill level: beginner, Cuisine: any`
-      }]),
-    });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    let result = '';
-    await reader.read().then(function processText({ done, value }) {
-      if (done) {
-        try {
-          console.log(result);
-          const responseData = JSON.parse(result);
-          setRecipeName(responseData.recipeName);
-          setRecipeIngredients(responseData.ingredients);
-          setInstructions(responseData.instructions);
-          setCookingTips(responseData.cookingTips);
-        } catch (error) {
-          console.error('Error parsing JSON:', error);
-        }
-        return result;
-      }
-      const text = decoder.decode(value || new Int8Array(), { stream: true });
-      result += text;
-      return reader.read().then(processText);
-    });
-  };
 
   return (
     <>
@@ -97,12 +104,16 @@ const IngredientsPage = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             CulinariQ
           </Typography>
-          <Button color="inherit" component={Link} href="/">
+          <Button color="inherit" href="/" >
             Back to Home
           </Button>
+          <SignedIn>
+            <UserButton />
+            <Button color="inherit">Logout</Button>
+          </SignedIn>
         </Toolbar>
       </AppBar>
-      <PageContainer>
+      <PageContainer onload={()=>onLoadIngredients()}>
         <h1 className="text-2xl font-bold mb-4">Select Ingredients</h1>
 
         {/* Selected Ingredients List */}
@@ -157,11 +168,13 @@ const IngredientsPage = () => {
           </Grid>
         </IngredientGrid>
 
-        <GenerateButton variant="contained"
-          onClick={fetchRecipe}
-          disabled={selectedIngredients.length === 0}>
-          Generate Recipe
-        </GenerateButton>
+
+        <Link href={{
+            pathname:'recipes',
+            query:{ingredients:selectedIngredients}
+          }} disabled={selectedIngredients.length === 0}>
+                <GenerateButton variant="contained" color="primary" disabled={selectedIngredients.length === 0} >Generate Recipes</GenerateButton>
+        </Link>
 
         {recipeName && (
           <Box mt={3}>
