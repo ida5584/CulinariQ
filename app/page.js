@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHatChef } from '@fortawesome/free-solid-svg-icons';
+import { faCloud, faHatChef } from '@fortawesome/free-solid-svg-icons';
 import {
   SignInButton,
   SignedIn,
@@ -54,7 +54,7 @@ export default function Home() {
           <Toolbar disableGutters sx={{ justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center', color: '#4CAF50', mr: 4 }}>
-                <FontAwesomeIcon icon={faHatChef} style={{ marginRight: '8px' }} /> CulinariQ
+                <FontAwesomeIcon icon={faCloud} style={{ marginRight: '8px' }} /> CulinariQ
               </Typography>
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <NavButton>How it works</NavButton>
