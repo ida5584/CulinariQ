@@ -2,9 +2,14 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
-import { Button, Grid, List, ListItem, ListItemButton, ListItemText, Card, CardContent, Typography, Chip, Box, AppBar, Toolbar } from '@mui/material';
+import { Button, Grid, Typography, Chip, Box, AppBar, Toolbar, Paper } from '@mui/material';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/system';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloud, faBellConcierge, faBowlRice, faDrumstickBite, faCarrot } from '@fortawesome/free-solid-svg-icons';
+
+const PRIMARY_GREEN = '#4CAF50';
+const PRIMARY_GREEN_DARK = '#45a049';
 
 const ingredients = {
   carbs: ['Rice', 'Pasta', 'Potato', 'Bread', 'Quinoa'],
@@ -12,26 +17,46 @@ const ingredients = {
   vegetables: ['Broccoli', 'Carrot', 'Spinach', 'Tomato', 'Bell Pepper']
 };
 
-
 const PageContainer = styled('div')({
   padding: '20px',
   paddingTop: '80px',
 });
 
-const IngredientGrid = styled(Grid)({
-  marginBottom: '20px',
-});
+const CategoryCard = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(2),
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  borderRadius: '16px',
+}));
 
-const GenerateButton = styled(Button)({
-  display: 'block',
-  marginLeft: 'auto',
-  marginRight: '0',
-  marginTop: '20px',
-  marginBottom: '20px',
-});
+const IngredientChip = styled(Chip)(({ theme, selected }) => ({
+  margin: theme.spacing(0.5),
+  borderRadius: '20px',
+  backgroundColor: selected ? PRIMARY_GREEN : 'transparent',
+  color: selected ? 'white' : 'rgba(0, 0, 0, 0.87)',
+  '&:hover': {
+    backgroundColor: selected ? PRIMARY_GREEN_DARK : 'rgba(0, 0, 0, 0.08)',
+  },
+}));
+
+const PrepareButton = styled(Button)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  borderRadius: '30px',
+  padding: '10px 20px',
+  color: PRIMARY_GREEN,
+  borderColor: PRIMARY_GREEN,
+  '&:hover': {
+    backgroundColor: 'rgba(76, 175, 80, 0.04)',
+    borderColor: PRIMARY_GREEN,
+  },
+  '& .MuiButton-startIcon': {
+    marginRight: theme.spacing(1),
+  },
+}));
 
 const IngredientsPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('carbs');
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [recipeName, setRecipeName] = useState('');
   const [recipeIngredients, setRecipeIngredients] = useState('');
@@ -86,16 +111,29 @@ const IngredientsPage = () => {
     });
   };
 
+
+  const categoryIcons = {
+    carbs: faBowlRice,
+    proteins: faDrumstickBite,
+    vegetables: faCarrot,
+  };
+
+  const categoryColors = {
+    carbs: '#FFD700',
+    proteins: '#FFA07A',
+    vegetables: '#90EE90',
+  };
+
   return (
     <>
       <Head>
         <title>Ingredients - CulinariQ</title>
         <meta name="description" content="Select your ingredients with CulinariQ" />
       </Head>
-      <AppBar position="fixed">
+      <AppBar position="fixed" color="transparent" elevation={0} sx={{ borderBottom: '1px solid #e0e0e0' }}>
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            CulinariQ
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', color: '#4CAF50' }}>
+            <FontAwesomeIcon icon={faCloud} style={{ marginRight: '8px' }} /> CulinariQ
           </Typography>
           <Button color="inherit" component={Link} href="/">
             Back to Home
@@ -103,65 +141,44 @@ const IngredientsPage = () => {
         </Toolbar>
       </AppBar>
       <PageContainer>
-        <h1 className="text-2xl font-bold mb-4">Select Ingredients</h1>
+        <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#333', mb: 4 }}>
+          Select ingredients to begin
+        </Typography>
 
-        {/* Selected Ingredients List */}
-        <div className="mb-4">
-          <Typography variant="h6" className="mb-2">Selected Ingredients:</Typography>
-          <div className="flex flex-wrap gap-2">
-            {selectedIngredients.map((ingredient) => (
-              <Chip
-                key={ingredient}
-                label={ingredient}
-                onDelete={() => handleRemoveIngredient(ingredient)}
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-          </div>
-        </div>
-
-        <IngredientGrid container spacing={3}>
-          <Grid item xs={3}>
-            <List>
-              {['carbs', 'proteins', 'vegetables'].map((category) => (
-                <ListItem key={category} disablePadding>
-                  <ListItemButton
-                    selected={selectedCategory === category}
-                    onClick={() => setSelectedCategory(category)}
-                  >
-                    <ListItemText primary={category.charAt(0).toUpperCase() + category.slice(1)} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Grid>
-          <Grid item xs={9}>
-            <Grid container spacing={2}>
-              {ingredients[selectedCategory].map((ingredient) => (
-                <Grid item xs={4} key={ingredient}>
-                  <Card
-                    onClick={() => handleIngredientToggle(ingredient)}
-                    sx={{
-                      cursor: 'pointer',
-                      backgroundColor: selectedIngredients.includes(ingredient) ? '#e3f2fd' : 'white',
-                    }}
-                  >
-                    <CardContent>
-                      <Typography variant="h6">{ingredient}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+        <Grid container spacing={3}>
+          {Object.entries(ingredients).map(([category, items]) => (
+            <Grid item xs={12} md={4} key={category}>
+              <CategoryCard style={{ backgroundColor: categoryColors[category] }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+                  <FontAwesomeIcon icon={categoryIcons[category]} style={{ marginRight: '8px' }} />
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
+                </Typography>
+                <Box>
+                  {items.map((ingredient) => (
+                    <IngredientChip
+                      key={ingredient}
+                      label={ingredient}
+                      onClick={() => handleIngredientToggle(ingredient)}
+                      selected={selectedIngredients.includes(ingredient)}
+                      variant="outlined"
+                    />
+                  ))}
+                </Box>
+              </CategoryCard>
             </Grid>
-          </Grid>
-        </IngredientGrid>
+          ))}
+        </Grid>
 
-        <GenerateButton variant="contained"
-          onClick={fetchRecipe}
-          disabled={selectedIngredients.length === 0}>
-          Generate Recipe
-        </GenerateButton>
+        <Box display="flex" justifyContent="center" mt={3}>
+          <PrepareButton
+            variant="outlined"
+            onClick={fetchRecipe}
+            disabled={selectedIngredients.length === 0}
+            startIcon={<FontAwesomeIcon icon={faBellConcierge} />}
+          >
+            Prepare
+          </PrepareButton>
+        </Box>
 
         {recipeName && (
           <Box mt={3}>
