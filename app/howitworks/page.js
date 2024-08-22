@@ -4,7 +4,7 @@ import React from 'react';
 import { AppBar, Box, Button, Container, Typography, Grid, Paper, Toolbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCloud, faHatChef, faList, faRobot, faUtensils } from '@fortawesome/free-solid-svg-icons';
+import { faCloud, faList, faRobot, faUtensils } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import {
   SignInButton,
@@ -67,9 +67,9 @@ export default function HowItWorks() {
                 <FontAwesomeIcon icon={faCloud} style={{ marginRight: '8px' }} /> CulinariQ
               </Typography>
               <Box sx={{ display: 'flex', gap: 2 }}>
-                <Link href="/howitworks" passHref style={{ textDecoration: 'none' }}>
-                    <NavButton>How it works</NavButton>
-                  </Link>
+                <Link href="/" passHref style={{ textDecoration: 'none' }}>
+                  <NavButton>Home</NavButton>
+                </Link>
                 <NavButton>Product</NavButton>
                 <NavButton>Pricing</NavButton>
               </Box>
@@ -90,7 +90,6 @@ export default function HowItWorks() {
           </Toolbar>
         </Container>
       </AppBar>
-
 
       <Box sx={{ py: 8 }}>
         <Container maxWidth="lg">
