@@ -2,17 +2,46 @@
 import { useState } from "react";
 import { AppBar, Box, Button, Grid, Stack, Toolbar, Typography, ListItem, ListItemText, List, Link } from "@mui/material";
 import ReactMarkdown from 'react-markdown';
-import { getStripe } from '@/utils/get-stripe'
 import hero_img from './Images/Food-hero_image.jpg'
 import Head from 'next/head'
 import {
   SignInButton,
   SignedIn,
   SignedOut,
-  UserButton
+  UserButton,
+  useUser
 } from '@clerk/nextjs'
+import { redirect } from "next/dist/server/api-utils";
+import getStripe from "@/utils/get-stripe";
 
 export default function Home() {
+  const { isLoaded, isSignedIn, user } = useUser()
+
+  const handleSubscriptionTier = async (tier) => {
+    if (isSignedIn === false ){
+      return redirect('/sign-in')
+    } else {
+      let price  =0
+      if (tier ==="Pro") {
+        price= 10
+      } else {
+        price= 3
+      }
+      console.log(`Tier: ${tier}Price:  ${price}`)
+      const checkoutSession = await fetch('/api/checkout_sessions', {
+        method: 'POST',
+        headers: { origin: 'http://localhost:3000', tier:tier, price: price},
+      })
+      const checkoutSessionJson = await checkoutSession.json()
+      const stripe = await getStripe()
+      const {error} = await stripe.redirectToCheckout({
+        sessionId: checkoutSessionJson.id,
+      })
+      if (error) {
+        console.warn(error.message)
+      }
+    }
+  }
 
   return (
     <Box
@@ -125,7 +154,7 @@ CulinariQ transforms your cooking experience in Calgary with personalized meal p
             <Grid item xs={4}>
               <Box sx={{ border: '1px solid', borderRadius: 2, p: 2 }}>
                 <Typography variant="h6">Basic</Typography>
-                <Typography variant="" >$5 USD/Month Weekly limits
+                <Typography variant="" >$3 USD/Month Weekly limits
                   <List dense={true}>
                     <ListItem>
                       <ListItemText primary="6 Recipes generated a week max" />
@@ -133,21 +162,20 @@ CulinariQ transforms your cooking experience in Calgary with personalized meal p
                     </ListItem>
                   </List>
                 </Typography>
-                <Button>Choose Basic</Button>
+                <Button onClick={()=> {handleSubscriptionTier("Basic")}}>Choose Basic</Button>
               </Box>
             </Grid>
             <Grid item xs={4}>
               <Box sx={{ border: '1px solid', borderRadius: 2, p: 2 }}>
-                <Typography variant="h6">Free Tier</Typography>
-                <Typography variant="" >Weekly limits
+                <Typography variant="h6">Pro Tier</Typography>
+                <Typography variant="" >$10 USD/Month Unlimited
                   <List dense={true}>
                     <ListItem>
-                      <ListItemText primary="6 Recipes generated a week max" />
-                      <ListItemText primary="Only 2 attempts at inputting ingredients" />
+                      <ListItemText primary="MUCH much more, In the works" />
                     </ListItem>
                   </List>
                 </Typography>
-                <Button>Read more</Button>
+                <Button onClick={()=> {handleSubscriptionTier("Pro")}}>Choose Pro</Button>
               </Box>
             </Grid>
 

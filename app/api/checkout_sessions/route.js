@@ -2,35 +2,38 @@ require("dotenv").config();
 
 import { NextResponse } from "next/server";
 // import { Stripe, loadStripe } from '@stripe/stripe-js';
-import Stripe from "stripe";
+// import Stripe from "stripe";
+const Stripe= require('stripe');
+const stripe = new Stripe(process.env.STRIPE_SECRET, {
+  apiVersion: '2022-11-15'
+})
 
-// const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-const formatAmountForStripe = {amount} => {
+const formatAmountForStripe = (amount) => {
     return Math.round(amount * 100)
 }
 
 
 export async function POST(req){
-    const stripe = new Stripe(process.env.STRIPE_SECRET, {
-        // apiVersion: '2024-06-20'
-    })
+    
+    // console.log(req.headers)
+    console.log("Request Tier: ",req.headers.get("tier"))
+    console.log("Request Price: ",req.headers.get("price"))
     
     const CURRENCY = 'usd'
-    const PRICE = 10 // USD
+    // const PRICE = 10 // USD
     // Subscription model
     const params = {
-        submit_type: 'subscription',
+        mode: 'subscription',
         payment_method_types: ['card'],
         line_items: [
           {
             price_data: {
                 currency: CURRENCY,
                 product_data:{
-                    name: 'Premium Subscription',
+                    name: `${req.headers.get("tier")} Subscription`,
                     
                 },
-                amount: formatAmountForStripe(PRICE),
+                unit_amount: formatAmountForStripe(parseInt(req.headers.get("price"))),
                 recurring:{
                   interval: 'month',
                   interval_count: 1,
@@ -39,25 +42,9 @@ export async function POST(req){
             quantity: 1,
           },
         ],
-        success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${req.headers.get("origin")}/result?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.get("origin")}/result?session_id={CHECKOUT_SESSION_ID}`,
       };
-
-    // Donation Model
-    // const params = {
-    //     submit_type: 'donate',
-    //     payment_method_types: ['card'],
-    //     line_items: [
-    //       {
-    //         name: 'Custom amount donation',
-    //         amount: formatAmountForStripe(amount, CURRENCY),
-    //         currency: CURRENCY,
-    //         quantity: 1,
-    //       },
-    //     ],
-    //     success_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-    //     cancel_url: `${req.headers.origin}/result?session_id={CHECKOUT_SESSION_ID}`,
-    //   };
       
     const checkoutSession =
         await stripe.checkout.sessions.create(params);
@@ -66,8 +53,10 @@ export async function POST(req){
 }
 
 export async function GET(req) {
+  // console.log(req)
   const searchParams = req.nextUrl.searchParams
   const session_id = searchParams.get('session_id')
+  console.log('session_id:', session_id)
 
   try {
     if (!session_id) {
